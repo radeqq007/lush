@@ -18,14 +18,6 @@ type Lush struct {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("No arguments provided.")
-		fmt.Println("Usage: lush <task>")
-		os.Exit(2) 
-	}
-
-	taskName := os.Args[1]
-
 	lush := &Lush{
 		tasks: make(map[string]bool),
 	}
@@ -42,11 +34,18 @@ func main() {
     os.Exit(1)
 	}
 
+	if len(os.Args) < 2 {
+		fmt.Println("No arguments provided.")
+		fmt.Println("Usage: lush <task>\n")
+		lush.listTasks()
+		os.Exit(2) 
+	}
+
+	taskName := os.Args[1]
+
 	if !lush.tasks[taskName] {
-		fmt.Fprintf(os.Stderr, "lush: task %q not found.\nAvailable tasks:\n", taskName)
-		for t := range lush.tasks {
-			fmt.Fprintf(os.Stderr, "  - %s\n", t)
-		}
+		fmt.Fprintf(os.Stderr, "lush: task %q not found.\n", taskName)
+		lush.listTasks()
 		os.Exit(1)
 	}
 	
@@ -54,6 +53,13 @@ func main() {
 	if err := l.ProtectedCall(0, 0, 0); err != nil {
 		fmt.Fprintf(os.Stderr, "lush: task %q failed: %v\n", taskName, err)
 		os.Exit(1)
+	}
+}
+
+func (lush Lush) listTasks() {
+	fmt.Println("Available tasks:")
+	for t := range lush.tasks {
+		fmt.Fprintf(os.Stderr, "  - %s\n", t)
 	}
 }
 
@@ -113,3 +119,4 @@ func (lush *Lush) registerTask(l *lua.State) int {
 
 	return 0
 }
+
