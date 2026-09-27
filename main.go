@@ -31,14 +31,14 @@ func main() {
 
 	if err := lua.DoFile(l, "lush.lua"); err != nil {
 		fmt.Fprintf(os.Stderr, "lush: %v\n", err)
-    os.Exit(1)
+		os.Exit(1)
 	}
 
 	if len(os.Args) < 2 {
 		fmt.Println("No arguments provided.")
 		fmt.Println("Usage: lush <task>\n")
 		lush.listTasks()
-		os.Exit(2) 
+		os.Exit(2)
 	}
 
 	taskName := os.Args[1]
@@ -48,7 +48,7 @@ func main() {
 		lush.listTasks()
 		os.Exit(1)
 	}
-	
+
 	l.Field(lua.RegistryIndex, "lush_task_"+taskName)
 	if err := l.ProtectedCall(0, 0, 0); err != nil {
 		fmt.Fprintf(os.Stderr, "lush: task %q failed: %v\n", taskName, err)
@@ -119,4 +119,3 @@ func (lush *Lush) registerTask(l *lua.State) int {
 
 	return 0
 }
-
