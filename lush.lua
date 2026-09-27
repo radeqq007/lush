@@ -5,6 +5,10 @@ task("build", function()
   print("Compiled.")
 end)
 
+task("format", function()
+  run("go", "fmt", ".")
+end)
+
 task("cleanup", function()
   run("rm", "-rf", "bin")
 end)
