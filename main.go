@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
+	"strings"
 
 	"github.com/Shopify/go-lua"
 )
@@ -14,7 +15,8 @@ import (
 var cmd string
 
 type Lush struct {
-	tasks map[string]bool
+	tasks   map[string]bool
+	running []string
 }
 
 func main() {
@@ -26,6 +28,7 @@ func main() {
 
 	l.Register("run", runCmd)
 	l.Register("task", lush.registerTask)
+	l.Register("run_task", lush.runTask)
 
 	lua.OpenLibraries(l)
 
@@ -116,6 +119,35 @@ func (lush *Lush) registerTask(l *lua.State) int {
 
 	l.PushValue(2)
 	l.SetField(lua.RegistryIndex, "lush_task_"+name)
+
+	return 0
+}
+
+func (lush *Lush) runTask(l *lua.State) int {
+	name, ok := l.ToString(1)
+	if !ok {
+		lua.Errorf(l, "run_task() expected a string as first argument.")
+		panic("unreachable")
+	}
+
+	if !lush.tasks[name] {
+		lua.Errorf(l, "task \"%s\" not found", name)
+		panic("unreachable")
+	}
+
+	for _, running := range lush.running {
+		if running == name {
+			chain := append(append([]string{}, lush.running...), name ) 
+			lua.Errorf(l, "circular task dependency %s", strings.Join(chain, " -> "))
+			panic("unreachable")
+		}
+	}
+
+	lush.running = append(lush.running, name)
+	defer func() { lush.running = lush.running[:len(lush.running)-1] }()
+
+	l.Field(lua.RegistryIndex, "lush_task_"+name)
+	l.Call(0, 0)
 
 	return 0
 }
