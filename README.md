@@ -12,8 +12,14 @@ task("build", function()
   print("Compiled.")
 end)
 
-task("cleanup", function()
-  run("rm", "-rf", "bin")
+task("format", function()
+  run("go", "fmt", ".")
+end)
+
+task("release", function()
+  run_task("format")
+  run_task("build")
+  print("Release ready: " .. output)
 end)
 ```
 
