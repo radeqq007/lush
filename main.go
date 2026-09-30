@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"syscall"
 	"strings"
+	"syscall"
 
 	"github.com/Shopify/go-lua"
 )
@@ -137,7 +137,7 @@ func (lush *Lush) runTask(l *lua.State) int {
 
 	for _, running := range lush.running {
 		if running == name {
-			chain := append(append([]string{}, lush.running...), name ) 
+			chain := append(append([]string{}, lush.running...), name)
 			lua.Errorf(l, "circular task dependency %s", strings.Join(chain, " -> "))
 			panic("unreachable")
 		}
