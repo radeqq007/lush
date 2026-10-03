@@ -1,6 +1,12 @@
 # Lush
 
-A very simple task runner.
+A simple task runner.
+
+# Installation
+
+```sh
+go install github.com/radeqq007/lush@latest
+```
 
 ## Example Usage
 
@@ -24,5 +30,5 @@ end)
 ```
 
 ```sh
-lush build
+lush release 
 ```
